@@ -40,8 +40,9 @@ class RelocatorRemapper extends Remapper {
 
     List<Relocator> relocators
     ShadowStats stats
+    boolean remapStrings
 
-    RelocatorRemapper(List<Relocator> relocators, ShadowStats stats) {
+    RelocatorRemapper(List<Relocator> relocators, ShadowStats stats, boolean remapStrings) {
         this.relocators = relocators
         this.stats = stats
     }
@@ -51,7 +52,7 @@ class RelocatorRemapper extends Remapper {
     }
 
     Object mapValue(Object object) {
-        if (object instanceof String) {
+        if (remapStrings && object instanceof String) {
             String name = (String) object
             String value = name
 

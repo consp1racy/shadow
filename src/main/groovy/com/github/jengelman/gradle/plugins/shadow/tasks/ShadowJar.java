@@ -33,6 +33,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
     private transient DependencyFilter dependencyFilter;
     private boolean enableRelocation;
     private String relocationPrefix = "shadow";
+    private boolean remapStrings = true;
     private boolean minimizeJar;
     private final transient DependencyFilter dependencyFilterForMinimize;
     private FileCollection toMinimize;
@@ -105,7 +106,7 @@ public class ShadowJar extends Jar implements ShadowSpec {
         DocumentationRegistry documentationRegistry = getServices().get(DocumentationRegistry.class);
         final UnusedTracker unusedTracker = minimizeJar ? UnusedTracker.forProject(getApiJars(), getSourceSetsClassesDirs().getFiles(), getToMinimize()) : null;
         return new ShadowCopyAction(getArchiveFile().get().getAsFile(), getInternalCompressor(), documentationRegistry,
-                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats,
+                this.getMetadataCharset(), transformers, relocators, getRootPatternSet(), shadowStats, remapStrings,
                 isPreserveFileTimestamps(), minimizeJar, unusedTracker);
     }
 
@@ -429,5 +430,14 @@ public class ShadowJar extends Jar implements ShadowSpec {
 
     public void setRelocationPrefix(String relocationPrefix) {
         this.relocationPrefix = relocationPrefix;
+    }
+
+    @Input
+    public boolean isRemapStrings() {
+        return remapStrings;
+    }
+
+    public void setRemapStrings(boolean remapStrings) {
+        this.remapStrings = remapStrings;
     }
 }

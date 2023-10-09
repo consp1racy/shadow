@@ -51,6 +51,7 @@ class ShadowCopyAction implements CopyAction {
     private final List<Relocator> relocators
     private final PatternSet patternSet
     private final ShadowStats stats
+    private final boolean remapStrings
     private final String encoding
     private final boolean preserveFileTimestamps
     private final boolean minimizeJar
@@ -58,7 +59,7 @@ class ShadowCopyAction implements CopyAction {
 
     ShadowCopyAction(File zipFile, ZipCompressor compressor, DocumentationRegistry documentationRegistry,
                             String encoding, List<Transformer> transformers, List<Relocator> relocators,
-                            PatternSet patternSet, ShadowStats stats,
+                            PatternSet patternSet, ShadowStats stats, boolean remapStrings,
                             boolean preserveFileTimestamps, boolean minimizeJar, UnusedTracker unusedTracker) {
 
         this.zipFile = zipFile
@@ -68,6 +69,7 @@ class ShadowCopyAction implements CopyAction {
         this.relocators = relocators
         this.patternSet = patternSet
         this.stats = stats
+        this.remapStrings = remapStrings
         this.encoding = encoding
         this.preserveFileTimestamps = preserveFileTimestamps
         this.minimizeJar = minimizeJar
@@ -106,7 +108,7 @@ class ShadowCopyAction implements CopyAction {
                 void execute(ZipOutputStream outputStream) {
                     try {
                         stream.process(new StreamAction(outputStream, encoding, transformers, relocators, patternSet,
-                                unusedClasses, stats))
+                                unusedClasses, stats, remapStrings))
                         processTransformers(outputStream)
                     } catch (Exception e) {
                         log.error('ex', e)
@@ -201,11 +203,11 @@ class ShadowCopyAction implements CopyAction {
 
         StreamAction(ZipOutputStream zipOutStr, String encoding, List<Transformer> transformers,
                             List<Relocator> relocators, PatternSet patternSet, Set<String> unused,
-                            ShadowStats stats) {
+                            ShadowStats stats, boolean remapStrings) {
             this.zipOutStr = zipOutStr
             this.transformers = transformers
             this.relocators = relocators
-            this.remapper = new RelocatorRemapper(relocators, stats)
+            this.remapper = new RelocatorRemapper(relocators, stats, remapStrings)
             this.patternSet = patternSet
             this.unused = unused
             this.stats = stats
