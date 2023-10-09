@@ -52,7 +52,7 @@ class RelocatorRemapper extends Remapper {
     }
 
     Object mapValue(Object object) {
-        if (remapStrings && object instanceof String) {
+        if (object instanceof String) {
             String name = (String) object
             String value = name
 
@@ -60,10 +60,19 @@ class RelocatorRemapper extends Remapper {
             String suffix = ""
 
             Matcher m = classPattern.matcher(name)
-            if (m.matches()) {
+            boolean matchesClassPattern = m.matches()
+            if (matchesClassPattern) {
                 prefix = m.group(1) + "L"
                 suffix = ""
                 name = m.group(2)
+            }
+
+            if (!remapStrings && !matchesClassPattern && value.indexOf('$') == -1) {
+                // remap lambda class names in kotlin debug info
+                // remap class names in kotlin metadata
+                // don't remap AIDL interface descriptors
+                // all this is highly contextual and fragile
+                return value
             }
 
             for (Relocator r : relocators) {
